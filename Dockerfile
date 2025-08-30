@@ -1,39 +1,22 @@
-# Use official PHP image with Apache
-FROM php:8.2-apache
+FROM richarvey/nginx-php-fpm:3.1.6
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libpq-dev \
-    libzip-dev \
-    zip \
-    && docker-php-ext-install pdo pdo_mysql zip
+USER root
+RUN apk update && apk add --no-cache nodejs npm
 
-# Enable Apache rewrite module
-RUN a2enmod rewrite
-
-# Set working directory
-WORKDIR /var/www/html
-
-# Copy project files
+# Copy project into container
 COPY . .
 
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Render-specific env flags (Render's image will run /start.sh)
+ENV SKIP_COMPOSER 1
+ENV WEBROOT /var/www/html/public
+ENV PHP_ERRORS_STDERR 1
+ENV RUN_SCRIPTS 1
+ENV REAL_IP_HEADER 1
+ENV COMPOSER_ALLOW_SUPERUSER 1
 
-# Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Laravel production defaults
+ENV APP_ENV production
+ENV APP_DEBUG false
+ENV LOG_CHANNEL stderr
 
-# Give permission to storage and bootstrap
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Expose port 80
-EXPOSE 80
-
-# Start Apache
-#CMD ["apache2-foreground"]
-
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
-
+CMD ["/start.sh"]

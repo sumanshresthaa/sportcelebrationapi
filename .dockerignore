@@ -1,3 +1,8 @@
-vendor
 node_modules
-.git
+vendor
+.env
+.DS_Store
+npm-debug.log
+yarn-error.log
+public/storage
+storage/*.key
