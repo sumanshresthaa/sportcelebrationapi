@@ -3,10 +3,13 @@ FROM richarvey/nginx-php-fpm:3.1.6
 USER root
 RUN apk update && apk add --no-cache nodejs npm
 
-# Copy project into container
-COPY . .
+# Set working directory
+WORKDIR /var/www/html
 
-# Render-specific env flags (Render's image will run /start.sh)
+# Copy Laravel project into /var/www/html
+COPY . /var/www/html
+
+# Render-specific env flags
 ENV SKIP_COMPOSER 1
 ENV WEBROOT /var/www/html/public
 ENV PHP_ERRORS_STDERR 1
