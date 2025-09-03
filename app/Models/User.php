@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -27,6 +26,11 @@ class User extends Authenticatable
         'chart_id',
         'support_country',
         'winner_prediction',
+        // 👇 add new OTP/verification fields
+        'otp_hash',
+        'otp_expires_at',
+        'is_verified',
+        'email_verified_at',
     ];
 
     /**
@@ -37,6 +41,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'otp_hash', // 👈 don’t leak OTP hashes in API responses
     ];
 
     /**
@@ -44,7 +49,9 @@ class User extends Authenticatable
      *
      * @var array<string, string>
      */
-    // protected $casts = [
-    //     'email_verified_at' => 'datetime',
-    // ];
+    protected $casts = [
+        'otp_expires_at' => 'datetime',
+        'email_verified_at' => 'datetime',
+        'is_verified' => 'boolean',
+    ];
 }
