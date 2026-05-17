@@ -18,6 +18,7 @@ class AuthOtpController extends Controller
         $request->validate([
             'first_name'        => 'required|string|max:255',
             'last_name'         => 'required|string|max:255',
+            'nickname'          => 'required|string|max:255',
             'email'             => 'required|string|email|max:255|unique:users',
             'password'          => 'required|string|min:8',
             'country_of_origin' => 'nullable|string|max:255',
@@ -33,6 +34,7 @@ class AuthOtpController extends Controller
         $user = User::create([
             'first_name'       => $request->first_name,
             'last_name'        => $request->last_name,
+            'nickname'         => $request->nickname,
             'email'            => $request->email,
             'password'         => Hash::make($request->password),
             'country_of_origin'=> $request->country_of_origin,
@@ -45,11 +47,11 @@ class AuthOtpController extends Controller
             'otp_expires_at'   => $expiresAt,
         ]);
 
-        // Send OTP via email
-        // Mail::raw("Your OTP code is: $otp", function ($message) use ($user) {
-        //     $message->to($user->email)
-        //         ->subject('Your OTP Code');
-        // });
+        //Send OTP via email
+        Mail::raw("Your OTP code is: $otp", function ($message) use ($user) {
+            $message->to($user->email)
+                ->subject('Your OTP Code');
+        });
 
         return response()->json([
             'message' => 'User registered. OTP sent to email.',
@@ -84,6 +86,7 @@ class AuthOtpController extends Controller
         if (!Hash::check($request->otp, $user->otp_hash)) {
             return response()->json(['message' => 'Invalid OTP'], 400);
         }
+     
 
         $user->update([
             'is_verified'    => true,

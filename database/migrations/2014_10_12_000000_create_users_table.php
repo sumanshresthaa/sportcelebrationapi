@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
+            $table->string('nickname')->nullable();
             $table->string('email')->unique();
             $table->string('password');
             $table->string('country_of_origin')->nullable();
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->string('chart_id')->nullable();
             $table->string('support_country')->nullable();
             $table->string('winner_prediction')->nullable();
+            $table->integer('total_points')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

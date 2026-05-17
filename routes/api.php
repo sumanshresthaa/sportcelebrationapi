@@ -4,7 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthOtpController;
-
+use App\Http\Controllers\FastApiController;
+use App\Http\Controllers\PointController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,16 +20,21 @@ use App\Http\Controllers\AuthOtpController;
 Route::post('/register', [AuthOtpController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-});
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+//For logged in users so these runs only with sessions
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/points', [PointController::class, 'store']);
+    Route::get('/points', [PointController::class, 'index']);
+    Route::get('/global-rank', [PointController::class, 'globalRank']);
+
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::delete('/user', [AuthController::class, 'deleteUser']);
+
+    //Logged in user information
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });
 
 Route::post('/verify-otp', [AuthOtpController::class, 'verifyOtp']);
 Route::post('/resend-otp', [AuthOtpController::class, 'resendOtp']);
-Route::get('/test', function () {
-    return response()->json(['ok' => true]);
-});
